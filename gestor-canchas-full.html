@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor Multicancha Deportiva</title>
+    <style>
+        :root {
+            --color-primary: #208C89;
+            --color-primary-hover: #1a6d6b;
+            --color-primary-active: #155553;
+            --color-secondary: #f5f5f5;
+            --color-surface: #ffffff;
+            --color-text: #1a1a1a;
+            --color-text-secondary: #666666;
+            --color-border: #e0e0e0;
+            --color-success: #22c55e;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
+            --color-info: #3b82f6;
+            --color-bg: #fafafa;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.15);
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+            color: white;
+            padding: var(--spacing-xl) var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 2px solid var(--color-border);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--color-primary);
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        @media (max-width: 1024px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card */
+        .card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-border);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-primary);
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            margin-bottom: var(--spacing-md);
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--color-text);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px var(--spacing-sm);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            background-color: var(--color-surface);
+            color: var(--color-text);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(32, 140, 137, 0.1);
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:active {
+            background-color: var(--color-primary-active);
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background-color: var(--color-secondary);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background-color: #eeeeee;
+        }
+
+        .btn-danger {
+            background-color: var(--color-error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+            margin-top: var(--spacing-md);
+        }
+
+        /* Form Row */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        /* Resumen Cards */
+        .resumen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .resumen-item {
+            background: var(--color-surface);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-lg);
+            border-left: 4px solid var(--color-primary);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+        }
+
+        .resumen-item h3 {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .resumen-item .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        /* Table Styles */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--color-surface);
+        }
+
+        thead {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        th {
+            padding: var(--spacing-md);
+            text-align: left;
+            font-weight: 600;
+            color: var(--color-text);
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--color-border);
+            font-size: 0.95rem;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status Badge */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .badge-reservado {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #1e40af;
+        }
+
+        .badge-pagado {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #15803d;
+        }
+
+        .badge-cancelado {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+        }
+
+        .badge-disponible {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #15803d;
+        }
+
+        .badge-ocupado {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+        }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            justify-content: center;
+        }
+
+        .btn-icon {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .btn-delete {
+            background-color: var(--color-error);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #dc2626;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xl);
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* Alert */
+        .alert {
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-md);
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #15803d;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .alert-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Section Container */
+        .section {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--spacing-lg);
+            border: 1px solid var(--color-border);
+        }
+
+        .section h2 {
+            margin-bottom: var(--spacing-md);
+            color: var(--color-text);
+            font-size: 1.4rem;
+            border-bottom: 2px solid var(--color-primary);
+            padding-bottom: var(--spacing-sm);
+        }
+
+        /* Currency Input */
+        .input-group {
+            display: flex;
+            position: relative;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+
+        .input-prefix {
+            position: absolute;
+            left: var(--spacing-sm);
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            pointer-events: none;
+        }
+
+        .input-group input[type="number"] {
+            padding-left: 35px;
+        }
+
+        /* Footer Spacing */
+        .footer {
+            text-align: center;
+            padding: var(--spacing-lg);
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+            margin-top: var(--spacing-xl);
+        }
+
+        /* Informe mensual */
+        .filtro-informe {
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+            align-items: flex-end;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background-color: #eef2ff;
+            color: #3730a3;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Disponibilidad Cancha */
+        .filtro-disponibilidad {
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+            align-items: flex-end;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .semana-tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+
+        .dia-btn {
+            padding: 8px 16px;
+            background-color: var(--color-secondary);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .dia-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .dia-btn.active {
+            background-color: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .cancha-horario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .cancha-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 2px solid var(--color-border);
+        }
+
+        .cancha-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: var(--spacing-md);
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
+        .horario-slot {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            margin: 4px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 85px;
+            cursor: default;
+        }
+
+        .slot-disponible {
+            background-color: rgba(34, 197, 94, 0.2);
+            color: #15803d;
+            border: 1px solid rgba(34, 197, 94, 0.5);
+        }
+
+        .slot-ocupado {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #991b1b;
+            border: 1px solid rgba(239, 68, 68, 0.5);
+        }
+
+        .horarios-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .legenda {
+            display: flex;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            padding: var(--spacing-md);
+            background-color: #f8f9fa;
+            border-radius: var(--radius-md);
+            flex-wrap: wrap;
+        }
+
+        .legenda-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .legenda-color {
+            width: 20px;
+            height: 20px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--color-border);
+        }
+
+        .legenda-color.disponible {
+            background-color: rgba(34, 197, 94, 0.4);
+        }
+
+        .legenda-color.ocupado {
+            background-color: rgba(239, 68, 68, 0.4);
+        }
+
+        /* Indicadores */
+        .indicadores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .indicador-card {
+            background: var(--color-surface);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-lg);
+            border-left: 4px solid var(--color-info);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .indicador-card h4 {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .indicador-valor {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-info);
+        }
+
+        .indicador-card.ocupacion { border-left-color: #f59e0b; }
+        .indicador-card.ocupacion .indicador-valor { color: #f59e0b; }
+
+        .indicador-card.ingresos { border-left-color: var(--color-success); }
+        .indicador-card.ingresos .indicador-valor { color: var(--color-success); }
+
+        .indicador-card.muerto { border-left-color: var(--color-error); }
+        .indicador-card.muerto .indicador-valor { color: var(--color-error); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏟️ Gestor Multicancha Deportiva</h1>
+            <p>Administra tus reservas de Fútbol, Voleibol, Minitejo y Bolirana de forma centralizada</p>
+        </div>
+
+        <!-- Alerts -->
+        <div id="alert" class="alert"></div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="cambiarTab('tab-reservas')">📋 Gestión de Reservas</button>
+            <button class="tab-btn" onclick="cambiarTab('tab-disponibilidad')">📅 Disponibilidad de Canchas</button>
+            <button class="tab-btn" onclick="cambiarTab('tab-informe')">📈 Informe Mensual</button>
+        </div>
+
+        <!-- TAB 1: Gestión de Reservas -->
+        <div id="tab-reservas" class="tab-content active">
+            <!-- Resumen general -->
+            <div class="resumen-grid">
+                <div class="resumen-item">
+                    <h3>Total de Reservas</h3>
+                    <div class="value" id="totalReservas">0</div>
+                </div>
+                <div class="resumen-item">
+                    <h3>Horas Totales</h3>
+                    <div class="value" id="totalHoras">0</div>
+                </div>
+                <div class="resumen-item">
+                    <h3>Ingresos Netos</h3>
+                    <div class="value" id="totalIngresos">$0</div>
+                </div>
+            </div>
+
+            <!-- Grid: Form y Cálculos -->
+            <div class="grid">
+                <!-- Formulario -->
+                <div class="card">
+                    <h2>📋 Nueva Reserva</h2>
+                    <form id="reservaForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fecha">Fecha *</label>
+                                <input type="date" id="fecha" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="horaInicio">Hora Inicio *</label>
+                                <input type="time" id="horaInicio" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="horaFin">Hora Fin *</label>
+                                <input type="time" id="horaFin" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="deporte">Deporte *</label>
+                                <select id="deporte" required>
+                                    <option value="">-- Seleccionar --</option>
+                                    <option value="Fútbol">⚽ Fútbol</option>
+                                    <option value="Voleibol">🏐 Voleibol</option>
+                                    <option value="Minitejo">🎯 Minitejo</option>
+                                    <option value="Bolirana">🎱 Bolirana</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="cancha">Cancha / Mesa *</label>
+                                <select id="cancha" required>
+                                    <option value="">-- Seleccionar --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cliente">Cliente *</label>
+                                <input type="text" id="cliente" placeholder="Nombre del cliente" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="telefono">Teléfono</label>
+                                <input type="tel" id="telefono" placeholder="Ej: 3001234567">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tipoReserva">Tipo de Reserva *</label>
+                                <select id="tipoReserva" required>
+                                    <option value="">-- Seleccionar --</option>
+                                    <option value="Partido">Partido</option>
+                                    <option value="Entrenamiento">Entrenamiento</option>
+                                    <option value="Torneo">Torneo</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="tipoDescuento">Tipo de Descuento</label>
+                                <select id="tipoDescuento">
+                                    <option value="0">Sin descuento</option>
+                                    <option value="10">10%</option>
+                                    <option value="20">20%</option>
+                                    <option value="100">Cortesía (100%)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="valorHora">Valor Hora *</label>
+                            <div class="input-group">
+                                <span class="input-prefix">$</span>
+                                <input type="number" id="valorHora" placeholder="50000" min="0" step="1000" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="estado">Estado</label>
+                            <select id="estado">
+                                <option value="Reservado">Reservado</option>
+                                <option value="Pagado">Pagado</option>
+                                <option value="Cancelado">Cancelado</option>
+                            </select>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">Guardar Reserva</button>
+                            <button type="reset" class="btn btn-secondary">Limpiar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Cálculos -->
+                <div class="card">
+                    <h2>📊 Resumen de Cálculos</h2>
+                    <div>
+                        <div class="form-group">
+                            <label>Horas Jugadas</label>
+                            <input type="number" id="horasJugadas" readonly style="background-color: #f8f9fa; cursor: not-allowed;">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Valor Bruto</label>
+                            <div class="input-group">
+                                <span class="input-prefix">$</span>
+                                <input type="number" id="valorBruto" readonly style="background-color: #f8f9fa; cursor: not-allowed;">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>% Descuento</label>
+                            <input type="number" id="porcentajeDescuento" readonly style="background-color: #f8f9fa; cursor: not-allowed;">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Valor Descuento</label>
+                            <div class="input-group">
+                                <span class="input-prefix">$</span>
+                                <input type="number" id="valorDescuento" readonly style="background-color: #f8f9fa; cursor: not-allowed;">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label style="font-weight: 700; font-size: 1.1rem;">Valor Neto</label>
+                            <div class="input-group">
+                                <span class="input-prefix">$</span>
+                                <input type="number" id="valorNeto" readonly style="background-color: #f0fdf4; cursor: not-allowed; font-weight: 700; font-size: 1.1rem;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Reservas -->
+            <div class="section">
+                <h2>📅 Reservas Registradas</h2>
+                <div class="table-responsive">
+                    <table id="reservasTable">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Deporte</th>
+                                <th>Cancha / Mesa</th>
+                                <th>Cliente</th>
+                                <th>Horario</th>
+                                <th>Horas</th>
+                                <th>Tipo</th>
+                                <th>Descuento</th>
+                                <th>Valor Neto</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reservasBody">
+                            <tr class="empty-state">
+                                <td colspan="11">No hay reservas registradas. ¡Crea la primera!</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Disponibilidad de Canchas (HORARIO 3PM A 12AM) -->
+        <div id="tab-disponibilidad" class="tab-content">
+            <div class="section">
+                <h2>📅 Disponibilidad de Agendamiento por Cancha (3 PM - 12 AM)</h2>
+                
+                <div class="filtro-disponibilidad">
+                    <div class="form-group">
+                        <label for="dispDeporte">Deporte</label>
+                        <select id="dispDeporte">
+                            <option value="Fútbol">⚽ Fútbol</option>
+                            <option value="Voleibol">🏐 Voleibol</option>
+                            <option value="Minitejo">🎯 Minitejo</option>
+                            <option value="Bolirana">🎱 Bolirana</option>
+                        </select>
+                    </div>
+                    <button id="btnActualizarDisp" class="btn btn-primary">Ver Disponibilidad</button>
+                </div>
+
+                <!-- Indicadores de Desempeño -->
+                <div>
+                    <h3 style="margin-bottom: var(--spacing-md); font-size: 1.1rem;">📊 Indicadores de Desempeño</h3>
+                    <div class="indicadores-grid" id="indicadores">
+                        <!-- Se llenará con JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Días de la Semana -->
+                <div class="semana-tabs" id="diasSemana">
+                    <!-- Se llenará con JavaScript -->
+                </div>
+
+                <div class="legenda">
+                    <div class="legenda-item">
+                        <div class="legenda-color disponible"></div>
+                        <span><strong>Verde:</strong> Disponible</span>
+                    </div>
+                    <div class="legenda-item">
+                        <div class="legenda-color ocupado"></div>
+                        <span><strong>Rojo:</strong> Ocupado</span>
+                    </div>
+                </div>
+
+                <div id="dispContent" class="cancha-horario-grid">
+                    <!-- Se llenará con JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Informe Mensual -->
+        <div id="tab-informe" class="tab-content">
+            <div class="section">
+                <h2>📈 Informe Mensual Acumulado</h2>
+                <div class="filtro-informe">
+                    <div class="form-group">
+                        <label for="informeAnio">Año</label>
+                        <select id="informeAnio"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="informeDeporte">Deporte</label>
+                        <select id="informeDeporte">
+                            <option value="Todos">Todos</option>
+                            <option value="Fútbol">⚽ Fútbol</option>
+                            <option value="Voleibol">🏐 Voleibol</option>
+                            <option value="Minitejo">🎯 Minitejo</option>
+                            <option value="Bolirana">🎱 Bolirana</option>
+                        </select>
+                    </div>
+                    <button id="btnActualizarInforme" class="btn btn-primary">Actualizar Informe</button>
+                    <span class="pill">Acumulado por mes: horas e ingresos netos</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mes</th>
+                                <th>Reservas</th>
+                                <th>Horas Totales</th>
+                                <th>Ingresos Netos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="informeBody">
+                            <tr class="empty-state">
+                                <td colspan="4">No hay datos para el filtro seleccionado.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 Gestor Multicancha Deportiva. Diseñado para optimizar tu centro deportivo.</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de canchas por deporte
+        const canchasPorDeporte = {
+            'Fútbol': [
+                'Sintética Fútbol 5 - 1',
+                'Sintética Fútbol 5 - 2',
+                'Sintética Fútbol 5 - 3',
+                'Sintética Fútbol 8 Personas',
+                'Pasto Fútbol 8 Jugadores'
+            ],
+            'Voleibol': [
+                'Cancha Voleibol 1',
+                'Cancha Voleibol 2',
+                'Cancha Voleibol 3',
+                'Cancha Voleibol 4'
+            ],
+            'Minitejo': [
+                'Mesa Minitejo 1',
+                'Mesa Minitejo 2',
+                'Mesa Minitejo 3',
+                'Mesa Minitejo 4',
+                'Mesa Minitejo 5'
+            ],
+            'Bolirana': [
+                'Mesa Bolirana 1',
+                'Mesa Bolirana 2',
+                'Mesa Bolirana 3'
+            ]
+        };
+
+        // Horarios disponibles (3 PM a 12 AM = 15:00 a 00:00)
+        const horariosDisponibles = [
+            '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'
+        ];
+
+        const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+        // Datos almacenados en memoria
+        let reservas = JSON.parse(localStorage.getItem('reservasMulticancha')) || [];
+        let diaSeleccionado = null;
+
+        // Elementos del DOM
+        const form = document.getElementById('reservaForm');
+        const alert = document.getElementById('alert');
+        const reservasBody = document.getElementById('reservasBody');
+        const fecha = document.getElementById('fecha');
+        const horaInicio = document.getElementById('horaInicio');
+        const horaFin = document.getElementById('horaFin');
+        const valorHora = document.getElementById('valorHora');
+        const tipoDescuento = document.getElementById('tipoDescuento');
+        const horasJugadas = document.getElementById('horasJugadas');
+        const valorBruto = document.getElementById('valorBruto');
+        const porcentajeDescuento = document.getElementById('porcentajeDescuento');
+        const valorDescuento = document.getElementById('valorDescuento');
+        const valorNeto = document.getElementById('valorNeto');
+        const deporte = document.getElementById('deporte');
+        const cancha = document.getElementById('cancha');
+
+        const totalReservasEl = document.getElementById('totalReservas');
+        const totalHorasEl = document.getElementById('totalHoras');
+        const totalIngresosEl = document.getElementById('totalIngresos');
+
+        const dispDeporte = document.getElementById('dispDeporte');
+        const dispContent = document.getElementById('dispContent');
+        const btnActualizarDisp = document.getElementById('btnActualizarDisp');
+        const diasSemanaContainer = document.getElementById('diasSemana');
+        const indicadores = document.getElementById('indicadores');
+
+        const informeAnio = document.getElementById('informeAnio');
+        const informeDeporte = document.getElementById('informeDeporte');
+        const informeBody = document.getElementById('informeBody');
+        const btnActualizarInforme = document.getElementById('btnActualizarInforme');
+
+        // Función para cambiar tabs
+        function cambiarTab(tabId) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => tab.classList.remove('active'));
+
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabId === 'tab-disponibilidad') {
+                generarDiasSemana();
+            }
+        }
+
+        window.cambiarTab = cambiarTab;
+
+        // Actualizar opciones de canchas según deporte seleccionado
+        function actualizarCanchas() {
+            const deporteSeleccionado = deporte.value;
+            cancha.innerHTML = '<option value="">-- Seleccionar --</option>';
+            
+            if (deporteSeleccionado && canchasPorDeporte[deporteSeleccionado]) {
+                canchasPorDeporte[deporteSeleccionado].forEach(c => {
+                    const option = document.createElement('option');
+                    option.value = c;
+                    option.textContent = c;
+                    cancha.appendChild(option);
+                });
+            }
+        }
+
+        deporte.addEventListener('change', actualizarCanchas);
+
+        // Calcular horas jugadas cuando cambian las horas
+        function calcularHoras() {
+            if (!horaInicio.value || !horaFin.value) return 0;
+            
+            const [hInicio, minInicio] = horaInicio.value.split(':').map(Number);
+            const [hFin, minFin] = horaFin.value.split(':').map(Number);
+            
+            let minutosTotales = (hFin * 60 + minFin) - (hInicio * 60 + minInicio);
+            
+            if (minutosTotales <= 0) {
+                showAlert('La hora de fin debe ser posterior a la hora de inicio', 'error');
+                return 0;
+            }
+            
+            return minutosTotales / 60;
+        }
+
+        // Actualizar cálculos en tiempo real
+        function actualizarCalculos() {
+            const horas = calcularHoras();
+            const valor = parseFloat(valorHora.value) || 0;
+            const descuento = parseFloat(tipoDescuento.value) || 0;
+            
+            const bruto = horas * valor;
+            const monto_descuento = (bruto * descuento) / 100;
+            const neto = bruto - monto_descuento;
+            
+            horasJugadas.value = horas ? horas.toFixed(2) : '';
+            valorBruto.value = bruto ? bruto.toFixed(0) : '';
+            porcentajeDescuento.value = descuento || 0;
+            valorDescuento.value = bruto ? monto_descuento.toFixed(0) : '';
+            valorNeto.value = bruto ? neto.toFixed(0) : '';
+        }
+
+        // Event listeners para cálculos
+        horaInicio.addEventListener('change', actualizarCalculos);
+        horaFin.addEventListener('change', actualizarCalculos);
+        valorHora.addEventListener('input', actualizarCalculos);
+        tipoDescuento.addEventListener('change', actualizarCalculos);
+
+        // Mostrar alertas
+        function showAlert(mensaje, tipo) {
+            alert.textContent = mensaje;
+            alert.className = `alert show alert-${tipo}`;
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 4000);
+        }
+
+        // Agregar reserva
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const horas = calcularHoras();
+            if (horas <= 0) {
+                showAlert('Las horas deben ser mayor a 0', 'error');
+                return;
+            }
+
+            if (!deporte.value) {
+                showAlert('Debe seleccionar el deporte', 'error');
+                return;
+            }
+
+            if (!cancha.value) {
+                showAlert('Debe seleccionar la cancha/mesa', 'error');
+                return;
+            }
+
+            const valorHoraNum = parseInt(valorHora.value) || 0;
+            const descuentoNum = parseInt(tipoDescuento.value) || 0;
+            const bruto = horas * valorHoraNum;
+            const valorDesc = (bruto * descuentoNum) / 100;
+            const neto = bruto - valorDesc;
+
+            const reserva = {
+                id: Date.now(),
+                fecha: fecha.value,
+                deporte: deporte.value,
+                horaInicio: horaInicio.value,
+                horaFin: horaFin.value,
+                cancha: cancha.value,
+                cliente: document.getElementById('cliente').value,
+                telefono: document.getElementById('telefono').value || 'N/A',
+                tipoReserva: document.getElementById('tipoReserva').value,
+                tipoDescuento: descuentoNum,
+                valorHora: valorHoraNum,
+                estado: document.getElementById('estado').value,
+                horas: horas,
+                valorBruto: bruto,
+                valorDescuento: valorDesc,
+                valorNeto: neto
+            };
+
+            reservas.push(reserva);
+            localStorage.setItem('reservasMulticancha', JSON.stringify(reservas));
+            
+            showAlert('✓ Reserva guardada exitosamente', 'success');
+            form.reset();
+            actualizarCanchas();
+            actualizarCalculos();
+            renderizarReservas();
+            actualizarResumen();
+            actualizarOpcionesAnios();
+            generarInformeMensual();
+        });
+
+        // Renderizar tabla de reservas
+        function renderizarReservas() {
+            if (reservas.length === 0) {
+                reservasBody.innerHTML = '<tr class="empty-state"><td colspan="11">No hay reservas registradas. ¡Crea la primera!</td></tr>';
+                return;
+            }
+
+            reservasBody.innerHTML = reservas.map(r => `
+                <tr>
+                    <td><strong>${new Date(r.fecha).toLocaleDateString('es-CO')}</strong></td>
+                    <td><strong>${r.deporte}</strong></td>
+                    <td>${r.cancha}</td>
+                    <td>${r.cliente}</td>
+                    <td>${r.horaInicio} - ${r.horaFin}</td>
+                    <td><strong>${r.horas.toFixed(2)} h</strong></td>
+                    <td>${r.tipoReserva}</td>
+                    <td>${r.tipoDescuento}%</td>
+                    <td><strong>$${r.valorNeto.toLocaleString('es-CO', {maximumFractionDigits: 0})}</strong></td>
+                    <td>
+                        <span class="badge badge-${r.estado.toLowerCase()}">${r.estado}</span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-icon btn-danger" onclick="eliminarReserva(${r.id})">🗑 Eliminar</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Eliminar reserva
+        function eliminarReserva(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar esta reserva?')) {
+                reservas = reservas.filter(r => r.id !== id);
+                localStorage.setItem('reservasMulticancha', JSON.stringify(reservas));
+                showAlert('✓ Reserva eliminada', 'success');
+                renderizarReservas();
+                actualizarResumen();
+                actualizarOpcionesAnios();
+                generarInformeMensual();
+            }
+        }
+
+        window.eliminarReserva = eliminarReserva;
+
+        // Actualizar resumen general
+        function actualizarResumen() {
+            const totalReservas = reservas.length;
+            const totalHoras = reservas.reduce((sum, r) => sum + r.horas, 0);
+            const totalIngresos = reservas.reduce((sum, r) => sum + r.valorNeto, 0);
+
+            totalReservasEl.textContent = totalReservas;
+            totalHorasEl.textContent = totalHoras.toFixed(2);
+            totalIngresosEl.textContent = `$${totalIngresos.toLocaleString('es-CO', {maximumFractionDigits: 0})}`;
+        }
+
+        // Opciones de años según las reservas
+        function actualizarOpcionesAnios() {
+            const anios = new Set();
+            reservas.forEach(r => {
+                if (r.fecha) {
+                    const anio = new Date(r.fecha).getFullYear();
+                    if (!isNaN(anio)) anios.add(anio);
+                }
+            });
+
+            if (anios.size === 0) {
+                const anioActual = new Date().getFullYear();
+                anios.add(anioActual);
+            }
+
+            const aniosOrdenados = Array.from(anios).sort((a, b) => a - b);
+
+            informeAnio.innerHTML = '';
+            aniosOrdenados.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a;
+                opt.textContent = a;
+                informeAnio.appendChild(opt);
+            });
+        }
+
+        // Informe mensual acumulado
+        function generarInformeMensual() {
+            if (!reservas.length) {
+                informeBody.innerHTML = '<tr class="empty-state"><td colspan="4">No hay datos para el filtro seleccionado.</td></tr>';
+                return;
+            }
+
+            const anioSeleccionado = parseInt(informeAnio.value) || new Date().getFullYear();
+            const deporteSeleccionado = informeDeporte.value;
+
+            const meses = [
+                'Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'
+            ];
+
+            const acumulado = meses.map((nombre, index) => ({
+                mesIndex: index,
+                mesNombre: nombre,
+                reservas: 0,
+                horas: 0,
+                ingresos: 0
+            }));
+
+            reservas.forEach(r => {
+                const fechaRes = new Date(r.fecha);
+                if (isNaN(fechaRes)) return;
+
+                const anioRes = fechaRes.getFullYear();
+                const mesRes = fechaRes.getMonth();
+
+                if (anioRes !== anioSeleccionado) return;
+                if (deporteSeleccionado !== 'Todos' && r.deporte !== deporteSeleccionado) return;
+
+                const slot = acumulado[mesRes];
+                slot.reservas += 1;
+                slot.horas += r.horas;
+                slot.ingresos += r.valorNeto;
+            });
+
+            const mesesConDatos = acumulado.filter(m => m.reservas > 0);
+
+            if (mesesConDatos.length === 0) {
+                informeBody.innerHTML = '<tr class="empty-state"><td colspan="4">No hay datos para el filtro seleccionado.</td></tr>';
+                return;
+            }
+
+            informeBody.innerHTML = mesesConDatos.map(m => `
+                <tr>
+                    <td><strong>${m.mesNombre}</strong></td>
+                    <td>${m.reservas}</td>
+                    <td>${m.horas.toFixed(2)} h</td>
+                    <td><strong>$${m.ingresos.toLocaleString('es-CO', {maximumFractionDigits: 0})}</strong></td>
+                </tr>
+            `).join('');
+        }
+
+        btnActualizarInforme.addEventListener('click', generarInformeMensual);
+
+        // GENERAR DÍAS DE LA SEMANA
+        function generarDiasSemana() {
+            diasSemanaContainer.innerHTML = '';
+            const hoy = new Date();
+
+            // Encontrar el domingo actual o anterior
+            const diaSemana = hoy.getDay();
+            const diff = hoy.getDate() - diaSemana;
+            const domingo = new Date(hoy.setDate(diff));
+
+            for (let i = 0; i < 7; i++) {
+                const fecha = new Date(domingo);
+                fecha.setDate(fecha.getDate() + i);
+                const fechaStr = fecha.toISOString().split('T')[0];
+                const nombreDia = diasSemana[i];
+                const diaMes = fecha.getDate();
+
+                const btn = document.createElement('button');
+                btn.className = 'dia-btn';
+                btn.textContent = `${nombreDia}\n${diaMes}`;
+                btn.onclick = () => seleccionarDia(fechaStr, btn);
+
+                if (i === 0) {
+                    btn.classList.add('active');
+                    diaSeleccionado = fechaStr;
+                }
+
+                diasSemanaContainer.appendChild(btn);
+            }
+
+            generarDisponibilidad();
+        }
+
+        // SELECCIONAR DÍA
+        function seleccionarDia(fecha, boton) {
+            document.querySelectorAll('.dia-btn').forEach(b => b.classList.remove('active'));
+            boton.classList.add('active');
+            diaSeleccionado = fecha;
+            generarDisponibilidad();
+        }
+
+        // GENERAR INDICADORES Y DISPONIBILIDAD
+        function generarDisponibilidad() {
+            if (!diaSeleccionado) return;
+
+            const deporteSeleccionado = dispDeporte.value;
+            const canchas = canchasPorDeporte[deporteSeleccionado] || [];
+
+            // Calcular indicadores
+            const horasTotalDisponibles = canchas.length * horariosDisponibles.length;
+            let horasOcupadas = 0;
+            let horasLibres = 0;
+            let ingresosTotal = 0;
+
+            canchas.forEach(nombreCancha => {
+                horariosDisponibles.forEach(horario => {
+                    const [hora, minuto] = horario.split(':');
+                    const horaFinal = parseInt(hora) + 1;
+                    const horaFinStr = String(horaFinal).padStart(2, '0') + ':' + minuto;
+
+                    const estaReservado = reservas.some(r => {
+                        const mismaFecha = r.fecha === diaSeleccionado;
+                        const mismaCancha = r.cancha === nombreCancha;
+                        const mismoDeporte = r.deporte === deporteSeleccionado;
+                        const horaReservaInicio = r.horaInicio;
+                        const horaReservaFin = r.horaFin;
+
+                        if (mismaFecha && mismaCancha && mismoDeporte) {
+                            const conflicto = horario < horaReservaFin && horaFinStr > horaReservaInicio;
+                            if (conflicto) {
+                                ingresosTotal += r.valorNeto;
+                            }
+                            return conflicto;
+                        }
+                        return false;
+                    });
+
+                    if (estaReservado) {
+                        horasOcupadas++;
+                    } else {
+                        horasLibres++;
+                    }
+                });
+            });
+
+            const porcentajeOcupacion = horasTotalDisponibles > 0 ? ((horasOcupadas / horasTotalDisponibles) * 100).toFixed(1) : 0;
+            const tiempoMuerto = horasLibres;
+
+            // Mostrar indicadores
+            indicadores.innerHTML = `
+                <div class="indicador-card ocupacion">
+                    <h4>Ocupación</h4>
+                    <div class="indicador-valor">${porcentajeOcupacion}%</div>
+                </div>
+                <div class="indicador-card ingresos">
+                    <h4>Ingresos del Día</h4>
+                    <div class="indicador-valor">$${ingresosTotal.toLocaleString('es-CO', {maximumFractionDigits: 0})}</div>
+                </div>
+                <div class="indicador-card muerto">
+                    <h4>Tiempo Muerto</h4>
+                    <div class="indicador-valor">${tiempoMuerto}h</div>
+                </div>
+                <div class="indicador-card">
+                    <h4>Horas Disponibles</h4>
+                    <div class="indicador-valor">${horasLibres}h</div>
+                </div>
+            `;
+
+            // Generar vista de canchas
+            let html = '';
+
+            canchas.forEach(nombreCancha => {
+                html += `
+                    <div class="cancha-card">
+                        <h3>${nombreCancha}</h3>
+                        <div class="horarios-container">
+                `;
+
+                horariosDisponibles.forEach(horario => {
+                    const [hora, minuto] = horario.split(':');
+                    const horaFinal = parseInt(hora) + 1;
+                    const horaFinStr = String(horaFinal).padStart(2, '0') + ':' + minuto;
+
+                    const estaReservado = reservas.some(r => {
+                        const mismaFecha = r.fecha === diaSeleccionado;
+                        const mismaCancha = r.cancha === nombreCancha;
+                        const mismoDeporte = r.deporte === deporteSeleccionado;
+                        const horaReservaInicio = r.horaInicio;
+                        const horaReservaFin = r.horaFin;
+
+                        if (mismaFecha && mismaCancha && mismoDeporte) {
+                            const conflicto = horario < horaReservaFin && horaFinStr > horaReservaInicio;
+                            return conflicto;
+                        }
+                        return false;
+                    });
+
+                    const clase = estaReservado ? 'slot-ocupado' : 'slot-disponible';
+                    const texto = estaReservado ? '❌ Ocupado' : '✓ Libre';
+
+                    html += `<span class="horario-slot ${clase}">${horario}<br><small>${texto}</small></span>`;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            dispContent.innerHTML = html;
+        }
+
+        btnActualizarDisp.addEventListener('click', () => {
+            if (diaSeleccionado) {
+                generarDisponibilidad();
+            }
+        });
+
+        dispDeporte.addEventListener('change', () => {
+            if (diaSeleccionado) {
+                generarDisponibilidad();
+            }
+        });
+
+        // Inicializar
+        window.addEventListener('load', function() {
+            renderizarReservas();
+            actualizarResumen();
+            actualizarOpcionesAnios();
+            generarInformeMensual();
+            const hoy = new Date().toISOString().split('T')[0];
+            fecha.value = hoy;
+        });
+    </script>
+</body>
+</html>
